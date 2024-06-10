@@ -1,33 +1,54 @@
-import React from 'react';
-import { View, Text } from 'react-native';
-import { StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
 
+function AboutScreen({ navigation }) {
+  // State for managing TextInput content
+  const [feedback, setFeedback] = useState('');
 
-const styles = StyleSheet.create({
-  titleText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-  },
-  contentText: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 5,
-    lineHeight: 24,
-    textAlign: 'center',
-  }
-});
-
-function AboutScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.titleText}>Welcome to FunFind, Discover Places Around You !</Text>
-      <Text style={styles.contentText}>
-        Explore historical sites, parks, and exciting dining spots all tailored to your preferences!
+      <Text style={styles.title}>Discover Fun Places Around You!</Text>
+      <Text style={styles.description}>
+        This app helps users discover interesting spots and activities around them based solely on their location and preferences.
       </Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter your feedback"
+        value={feedback}
+        onChangeText={setFeedback} // Update the feedback state on text change
+      />
+      <Button title="Submit Feedback" onPress={() => alert("Feedback Submitted: " + feedback)} />
+      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
     </View>
   );
 }
+
+// Styles for the component
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    fontSize: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  description: {
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    width: '100%',
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  }
+});
 
 export default AboutScreen;

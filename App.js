@@ -21,7 +21,7 @@ function App() {
           },
         }}/>
         <Stack.Screen name="About" component={AboutScreen} options={{
-          title: 'My home',
+          title: 'About us',
           headerStyle: {
             backgroundColor: '#5f9ea0',
           },
