@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
+import UserContext from './UserContext'; // Import the context
 
 function AboutScreen({ navigation }) {
-  // State for managing TextInput content
-  const [feedback, setFeedback] = useState('');
+  const { userName, setUserName } = useContext(UserContext); // Use context
 
   return (
     <View style={styles.container}>
@@ -13,17 +13,16 @@ function AboutScreen({ navigation }) {
       </Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter your feedback"
-        value={feedback}
-        onChangeText={setFeedback} // Update the feedback state on text change
+        placeholder="Enter your name"
+        value={userName}
+        onChangeText={text => setUserName(text)} // Update the user name on text change
       />
-      <Button title="Submit Feedback" onPress={() => alert("Feedback Submitted: " + feedback)} />
+      <Button title="Update Name" onPress={() => alert("Name Updated: " + userName)} />
       <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
     </View>
   );
 }
 
-// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -52,3 +51,6 @@ const styles = StyleSheet.create({
 });
 
 export default AboutScreen;
+
+
+
