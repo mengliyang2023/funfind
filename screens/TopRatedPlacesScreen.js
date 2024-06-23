@@ -1,9 +1,10 @@
-import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 import UserContext from './UserContext';
 
 function TopRatedPlacesScreen() {
-  const { topRatedPlaces } = useContext(UserContext);
+  const { topRatedPlaces, topRatedReview, clearTopRatedReview } = useContext(UserContext);
+  const [showTopReview, setShowTopReview] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -12,16 +13,33 @@ function TopRatedPlacesScreen() {
         keyExtractor={item => item.placeId.toString()}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Text style={styles.title}>{item.name}</Text> // Displaying the place name
+            <Text style={styles.title}>{item.name}</Text>
             <Text>{item.rating.toFixed(1)} Stars</Text>
             <Text>{item.reviewCount} Reviews</Text>
           </View>
         )}
       />
+      <Button
+        title="Show Top Rated Review"
+        onPress={() => setShowTopReview(true)}
+      />
+      {showTopReview && topRatedReview && (
+        <View>
+          <Text style={styles.reviewTitle}>Top Review:</Text>
+          <Text>{topRatedReview.text}</Text>
+          <Text>{topRatedReview.rating} Stars</Text>
+        </View>
+      )}
+      <Button
+        title="Clear"
+        onPress={() => {
+          clearTopRatedReview();
+          setShowTopReview(false);
+        }}
+      />
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -36,6 +54,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  reviewTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 20,
   }
 });
 
