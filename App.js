@@ -5,7 +5,7 @@ import HomeScreen from './screens/HomeScreen';
 import AboutScreen from './screens/AboutScreen';
 import ReviewsScreen from './screens/ReviewsScreen';
 import TopRatedPlacesScreen from './screens/TopRatedPlacesScreen';
-import { UserProvider } from './screens/UserContext'; // Import the provider
+import { UserProvider } from './screens/UserContext'; 
 
 const Tab = createBottomTabNavigator();
 

@@ -24,12 +24,16 @@ function TopRatedPlacesScreen() {
         onPress={() => setShowTopReview(true)}
       />
       {showTopReview && topRatedReview && (
-        <View>
-          <Text style={styles.reviewTitle}>Top Review:</Text>
-          <Text>{topRatedReview.text}</Text>
-          <Text>{topRatedReview.rating} Stars</Text>
+      topRatedReview.map((review, index) => (
+        <View key={index}>
+            <Text style={styles.reviewTitle}>Top Review:</Text>
+            <Text>{review.text}</Text>
+            <Text>{review.rating} Stars</Text>
         </View>
-      )}
+    ))
+)}
+
+
       <Button
         title="Clear"
         onPress={() => {
@@ -37,6 +41,11 @@ function TopRatedPlacesScreen() {
           setShowTopReview(false);
         }}
       />
+
+      <Button
+        title="Go to Home"
+        onPress={() => navigation.navigate('Home')}  // Navigate to Home screen
+      />  
     </View>
   );
 }

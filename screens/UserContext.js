@@ -4,61 +4,83 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
+  // State to hold all the variables.
   const [userName, setUserName] = useState('Guest');
   const [reviews, setReviews] = useState([]);
   const [topRatedPlaces, setTopRatedPlaces] = useState([]);
-  const [topRatedReview, setTopRatedReview] = useState(null);  // State to hold the top-rated review
+  const [topRatedReview, setTopRatedReview] = useState([]);
 
   // Load initial data from AsyncStorage when the app starts
   useEffect(() => {
     const loadData = async () => {
-      try {
-        const storedUserName = await AsyncStorage.getItem('userName');
-        if (storedUserName) setUserName(storedUserName);
-  
-        const storedReviews = await AsyncStorage.getItem('reviews');
-        if (storedReviews) setReviews(JSON.parse(storedReviews));
-  
-        const storedTopRatedPlaces = await AsyncStorage.getItem('topRatedPlaces');
-        if (storedTopRatedPlaces) setTopRatedPlaces(JSON.parse(storedTopRatedPlaces));
-  
-        const storedTopRatedReview = await AsyncStorage.getItem('topRatedReview');
-        if (storedTopRatedReview) setTopRatedReview(JSON.parse(storedTopRatedReview));
-      } catch (error) {
-        console.error('Failed to load data from AsyncStorage:', error);
-      }
+        try {
+            const storedUserName = await AsyncStorage.getItem('userName');
+            const storedReviews = await AsyncStorage.getItem('reviews');
+            const storedTopRatedReview = await AsyncStorage.getItem('topRatedReview');
+
+            if (storedUserName) setUserName(storedUserName);
+            if (storedReviews) setReviews(JSON.parse(storedReviews));
+            if (storedTopRatedReview) {
+              const parsedReviews = JSON.parse(storedTopRatedReview);
+              setTopRatedReview(Array.isArray(parsedReviews) ? parsedReviews : [parsedReviews]);
+          }
+            console.log('Data successfully loaded from AsyncStorage');
+        } catch (error) {
+            console.error('Failed to load data from AsyncStorage:', error);
+        }
     };
-  
     loadData();
-  }, []);
+}, []);
+
 
   // Save data whenever it changes
   useEffect(() => {
-    AsyncStorage.setItem('userName', userName);
-    AsyncStorage.setItem('reviews', JSON.stringify(reviews));
-    AsyncStorage.setItem('topRatedPlaces', JSON.stringify(topRatedPlaces));
-    AsyncStorage.setItem('topRatedReview', JSON.stringify(topRatedReview)); // Save top-rated review
+    const saveData = async () => {
+      try {
+        await AsyncStorage.setItem('userName', userName);
+        await AsyncStorage.setItem('reviews', JSON.stringify(reviews));
+        await AsyncStorage.setItem('topRatedPlaces', JSON.stringify(topRatedPlaces));
+        await AsyncStorage.setItem('topRatedReview', JSON.stringify(topRatedReview));
+
+        console.log('Data successfully saved to AsyncStorage');
+      } catch (error) {
+        console.error('Failed to save data to AsyncStorage:', error);
+      }
+    };
+    saveData();
   }, [userName, reviews, topRatedPlaces, topRatedReview]);
 
-  // Add a new review and update top-rated review if necessary
-  const addReview = (review) => {
-    setReviews(prevReviews => {
-      const newReviews = [...prevReviews, review];
-      AsyncStorage.setItem('reviews', JSON.stringify(newReviews)); // Save all reviews
+// Add a new review and update top-rated review if necessary
+const addReview = async (review) => {
+  try {
+      const updatedReviews = [...reviews, review];
+      await AsyncStorage.setItem('reviews', JSON.stringify(updatedReviews));
+      setReviews(updatedReviews); // Update state to trigger re-render
 
-      // Check and update top-rated review if the new review is higher rated
-      if (!topRatedReview || review.rating > topRatedReview.rating) {
-        setTopRatedReview(review);
-        AsyncStorage.setItem('topRatedReview', JSON.stringify(review)); // Save new top-rated review
+      // Determine if this review matches or exceeds the highest rating
+      if (!topRatedReview.length || review.rating > topRatedReview[0].rating) {
+          setTopRatedReview([review]); // Start a new array with the new top review
+          await AsyncStorage.setItem('topRatedReview', JSON.stringify([review]));
+      } else if (review.rating === topRatedReview[0].rating) {
+          const updatedTopReviews = [...topRatedReview, review];
+          setTopRatedReview(updatedTopReviews); // Add to the existing top reviews
+          await AsyncStorage.setItem('topRatedReview', JSON.stringify(updatedTopReviews));
       }
-      return newReviews;
-    });
-  };
+  } catch (error) {
+      console.error('Failed to save review or update top rated reviews:', error);
+  }
+};
+
 
   // Clear the top-rated review
-  const clearTopRatedReview = () => {
-    setTopRatedReview(null);
-    AsyncStorage.removeItem('topRatedReview');
+  const clearTopRatedReview = async () => {
+    try {
+      setTopRatedReview(null);
+      await AsyncStorage.removeItem('topRatedReview');
+      console.log('Top rated review cleared from AsyncStorage');
+    } catch (error) {
+      console.error('Failed to clear top-rated review from AsyncStorage:', error);
+    }
   };
 
   const value = {
@@ -66,7 +88,7 @@ export const UserProvider = ({ children }) => {
     setUserName,
     reviews,
     addReview,
-    topRatedPlaces,
+    // topRatedPlaces,
     topRatedReview,
     clearTopRatedReview
   };
